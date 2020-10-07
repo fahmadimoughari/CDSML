@@ -1,0 +1,1 @@
+The features matrices contains the copy number variation, gene expression, and mutations for cell lines, chemical substructure of drugs, and IC50 values and binarized sensitivity matrix on all cell line-drug pairs.
