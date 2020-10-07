@@ -18,7 +18,7 @@ Python 3.6 and upper:
 
 #### Input parameters
 To execute the codes, the user must provide three input files
-- `response_dirc`: the directory to a file which contains the binary sensitivity matrix (Number of rows = number of cell lines and number of columns = number of drugs)
+- `label_dirc`: the directory to a file which contains the binary sensitivity matrix (Number of rows = number of cell lines and number of columns = number of drugs)
 - `simC_dirc`: the directory to a file that is a square matrix containing the similarity of cell lines
 - `simD_dirc`: the directory to a file that is a square matrix containing the similarity of drugs.
 - `dim`: the dimension of latent space
@@ -34,7 +34,7 @@ __Command__
 
 The following command is a sample of executing ADRML
 ```sh
-python CDSML.py response_dirc=../Data/Features/GDSC_R_sensitive.csv  simC_dirc=../Data/Similarities/GDSC_Expression.csv simD_dric=../Data/Similarities/GDSC_Chemical.csv dim=0.7 miu=2.7 lambda=4 CV=5 repetition=30
+python CDSML.py label_dirc=../Data/Features/B_Sensitivity.csv  simC_dirc=../Data/SC_GeneExpression.csv simD_dric=../Data/SD_Chemical.csv dim=0.7 miu=2.7 lambda=4 CV=5 repetition=30
 ```
 
 ## Contact
