@@ -7,7 +7,7 @@ This repository contains the implementated codes of CDSML, off-the-shelf machine
 ## A giude to run CDSML
 Please make sure to have the following libraries installed.
 #### Required libraries
-Python 3.r and upper:
+Python 3.6 and upper:
 - Numpy
 - sklearn
 - Argparse
