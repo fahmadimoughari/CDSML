@@ -5,18 +5,9 @@ Created on Wed Oct  7 03:14:32 2020
 @author: fahma
 """
 
-# -*- coding: utf-8 -*-
-"""
-Created on Sun May 31 13:20:47 2020
-
-@author: fahma
-"""
-
-
 # Importing required libraries
 
 import sys
-import os.path
 import copy
 import numpy as np
 import random
@@ -55,10 +46,10 @@ def modelEvaluation(real_matrix,predict_matrix,testPosition):
        """ This function computes the evaluation criteria
        
        real_matrix: is a matrix with cell lines in rows, drugs in columns,
-       and real IC50 in its elemnts
+       and real labels in its elemnts
        
        predict_matrix: has the same size as the real matrix 
-       with the predicted IC50 values
+       with the predicted sensitivity probabilities
        
        testPosition: is a vecoto, containing the pairs of (i,j) indices of 
        cell line-drug pairs that were considered as the test samples 
@@ -110,11 +101,11 @@ def modelEvaluation(real_matrix,predict_matrix,testPosition):
        return results
 
 
-def runapp(response_file, simC_name, simD_name, percent, miu, landa, CV_num, repetition):
+def runapp(label_file, simC_name, simD_name, percent, miu, landa, CV_num, repetition):
     
     """ This function runs the cross validtion
     
-    response_file is the address and name of real IC50 file
+    label_file is the address and name of real labels file
     SimC_name and SimD_name are the address and name of similarity matrices
     of cell lines and drugs, respectively
     percent is the rank of latent matrix
@@ -127,8 +118,8 @@ def runapp(response_file, simC_name, simD_name, percent, miu, landa, CV_num, rep
     #-----------------------------------------------------------
     
     
-    #reading IC50 file
-    R = np.loadtxt(response_file, dtype=float, delimiter=",") 
+    #reading label file
+    R = np.loadtxt(label_file, dtype=float, delimiter=",") 
     
     # reading similarity matrices
     simD = np.loadtxt(simD_name, dtype=float, delimiter=",")
@@ -234,8 +225,8 @@ def main():
     # get the options from user
     for arg in sys.argv[1:]:
       (key,val) = arg.rstrip().split('=')
-      if key == 'response_dirc':
-          response_file=val
+      if key == 'label_file':
+          label_file=val
       elif key=='simC_dirc':
           simC_name=val
       elif key=='simD_dirc':
@@ -252,6 +243,6 @@ def main():
           repetition=int(val)
           
     # call the method
-    runapp(response_file, simC_name, simD_name, percent, miu, landa, CV_num, repetition)
+    runapp(label_file, simC_name, simD_name, percent, miu, landa, CV_num, repetition)
     
 main()
