@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Apr 17 05:09:27 2020
+Created on Fri Mar  5 21:04:00 2021
 
 @author: fahma
+
 """
 import numpy
 import numpy as np
 from numpy.linalg import inv
 
-def manifold_learning(Train_B, P, Q, K, SimD, SimC, landa, miu):
+def manifold_learning(Train_B, P, Q, K, SimD, SimC, landa, miu, simCflag, simDflag):
     
     """ This function runs the manifold learning and trains the latent matrices
         Train_B is the training matrix 
@@ -16,7 +17,9 @@ def manifold_learning(Train_B, P, Q, K, SimD, SimC, landa, miu):
         K is the dimension of latent space
         SimD and SimC are the similarity matrices of drugs and cell lines
         landa controls the similarity conservation while manifold learning
-        miu is the regularization coeeficient for latent matrices        
+        miu is the regularization coeeficient for latent matrices 
+		simCflag is a falg defining whether simC is used or not
+		simDflag is a falg defining whether simD is used or not
     """
     
     converge = False
@@ -25,11 +28,11 @@ def manifold_learning(Train_B, P, Q, K, SimD, SimC, landa, miu):
         
         # update P
          for i in range(len(Train_B)):
-            P[i] = update_p(i,Train_B, P, Q, K, SimC, landa, miu)
+            P[i] = update_p(i,Train_B, P, Q, K, SimC, landa, miu, simCflag)
             
         # update Q
          for j in range(len(Train_B[0])):
-            Q[j] = update_q(j,Train_B, P, Q, K, SimD, landa, miu)
+            Q[j] = update_q(j,Train_B, P, Q, K, SimD, landa, miu, simDflag)
         
         # computing the difference in predicted matrix of two subsequnt iterations 
          new_pred = P.dot(Q.T)
@@ -42,11 +45,12 @@ def manifold_learning(Train_B, P, Q, K, SimD, SimC, landa, miu):
          # less than 0.01, the method is converged
          if difference < 0.01:
              converge = True
+         print(difference)
              
     return new_pred, P, Q
 
 #-----------------------------------------------------
-def update_p(i, Train_B, P, Q, K, SimC, landa, miu):
+def update_p(i, Train_B, P, Q, K, SimC, landa, miu, simCflag):
     """ This function updates the ith row of P matrix
     
         i is the number of row
@@ -60,20 +64,21 @@ def update_p(i, Train_B, P, Q, K, SimC, landa, miu):
     
     pi = Train_B[i,:].dot(Q)
     pi = pi.reshape(1,K)
+    if simCflag == False:
+        xi2 = 0
+        for j in range(len(SimC[i])):
+            xi2 = numpy.dot(SimC[i,j] + SimC[j,i],(P[j])) + xi2
     
-    xi2 = 0
-    for j in range(len(SimC[i])):
-        xi2 = numpy.dot(SimC[i,j] + SimC[j,i],(P[j])) + xi2
-
-    pi = pi + numpy.dot(landa, (xi2))
+        pi = pi + numpy.dot(landa, (xi2))
     I = numpy.identity(K)
     xi3 = (numpy.dot((Q.T), Q) + numpy.dot(miu,I))
     
-    xi4 = 0
-    for j in range(len(SimC[i])):
-        xi4 = (SimC[i,j] + SimC[j,i]) + xi4
-    
-    xi3 = xi3 + numpy.dot(landa * xi4, I)
+    if simCflag == False:
+        xi4 = 0
+        for j in range(len(SimC[i])):
+            xi4 = (SimC[i,j] + SimC[j,i]) + xi4
+        
+        xi3 = xi3 + numpy.dot(landa * xi4, I)
     xi3 = inv(xi3)
     xi3 = xi3.reshape(K, K)
     final = pi.dot(xi3)
@@ -85,7 +90,7 @@ def update_p(i, Train_B, P, Q, K, SimC, landa, miu):
     
 #B(j,:)=(Y(:,j)'*A+alpha*(W_c(j,:)+(W_c(:,j))')*B)/(A'*A+alpha*sum(W_c(j,:)+(W_c(:,j))')*eye(f)+lamda*eye(f));
 #Update yj---------------------------------------
-def update_q(j, Train_B, P, Q, K, SimD, landa, miu):
+def update_q(j, Train_B, P, Q, K, SimD, landa, miu, simDflag):
     """ This function updates the jth row of Q matrix
     
         i is the number of row
@@ -101,19 +106,20 @@ def update_q(j, Train_B, P, Q, K, SimD, landa, miu):
     qj = (Train_B[:, j].T).dot(P)
     qj = qj.reshape(1, K)
     
-    xi2 = 0
-    for i in range(len(SimD[j])):
-       xi2 = numpy.dot((SimD[i,j] + SimD[j,i]), Q[i]) + xi2
-
-    qj = qj + numpy.dot(landa, (xi2))
+    if simDflag == False:
+        xi2 = 0
+        for i in range(len(SimD[j])):
+           xi2 = numpy.dot((SimD[i,j] + SimD[j,i]), Q[i]) + xi2
+    
+        qj = qj + numpy.dot(landa, (xi2))
     I = numpy.identity(K)
     xi3 = (numpy.dot((P.T), P) + numpy.dot(miu, I))
-    
-    xi4 = 0 
-    for j in range(len(SimD[j])):
-        xi4 = (SimD[i,j] + SimD[j,i]) + xi4
-    
-    xi3 = xi3 + numpy.dot(landa * xi4, I)
+    if simDflag == False:
+        xi4 = 0 
+        for i in range(len(SimD[j])):
+            xi4 = (SimD[i,j] + SimD[j,i]) + xi4
+        
+        xi3 = xi3 + numpy.dot(landa * xi4, I)
     xi3 = inv(xi3)
     xi3.reshape(K, K)
     final = qj.dot(xi3)
