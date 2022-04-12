@@ -185,10 +185,10 @@ def runapp(label_file, simC_name, simD_name, percent, miu, landa, CV_num, repeti
             Q = np.random.rand(M, K)
             
             # calling the manifold learning on the sensitivity matrix
-            predict_matrix1, A1,B1 = manifold_learning(train_IC, P, Q, K, simD, simC, landa, miu)
+            predict_matrix1, A1,B1 = manifold_learning(train_IC, P, Q, K, simD, simC, landa, miu, False, True)
             
             # calling the manifold learning on the transpose of sensitivity matrix
-            predict_matrix2, A2,B2 = manifold_learning(train_IC.T, B1, A1, K, simC, simD, landa, miu)
+            predict_matrix2, A2,B2 = manifold_learning(train_IC.T, B1, A1, K, simC, simD, landa, miu, False, True)
             
             # compute the final prediction matrix
             predict_matrix = 0.5 * (predict_matrix1 + predict_matrix2.T)
